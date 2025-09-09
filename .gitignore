@@ -1,0 +1,30 @@
+# Gradle 관련 파일은 무시하지만 래퍼는 예외로 둔다
+.gradle/
+build/
+bin/
+!gradle/wrapper/gradle-wrapper.jar  # Gradle 래퍼는 커밋해야 함
+!gradlew
+!gradlew.bat
+!**/src/main/**/build/  # 소스 내 빌드 디렉토리 예외
+!**/src/test/**/build/  # 테스트 내 빌드 디렉토리 예외
+
+# IntelliJ IDEA 관련 파일들
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# VS Code 관련 파일들
+.vscode/
+
+# STS 관련 파일들
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
