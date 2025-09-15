@@ -16,6 +16,10 @@ public class UserDto {
     public static class LoginResDto {
         Long id;
     }
+    @Setter @Getter @Builder
+    public static class TokenResDto {
+        String token;
+    }
 
     /**/
 

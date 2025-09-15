@@ -1,11 +1,14 @@
 package com.thc.spradv2025fall.service.impl;
 
+import com.thc.spradv2025fall.domain.RefreshToken;
 import com.thc.spradv2025fall.domain.User;
 import com.thc.spradv2025fall.dto.UserDto;
 import com.thc.spradv2025fall.dto.DefaultDto;
 import com.thc.spradv2025fall.mapper.UserMapper;
+import com.thc.spradv2025fall.repository.RefreshTokenRepository;
 import com.thc.spradv2025fall.repository.UserRepository;
 import com.thc.spradv2025fall.service.UserService;
+import com.thc.spradv2025fall.util.TokenFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,15 +21,38 @@ public class UserServiceImpl implements UserService {
 
     final UserRepository userRepository;
     final UserMapper userMapper;
+    final RefreshTokenRepository refreshTokenRepository;
+    final TokenFactory tokenFactory;
+
+//    @Override
+//    public UserDto.LoginResDto login(UserDto.LoginReqDto param) {
+//        Long id = null;
+//        User user = userRepository.findByUsernameAndPassword(param.getUsername(), param.getPassword());
+//        if(user != null){
+//            id = user.getId();
+//        }
+//        return UserDto.LoginResDto.builder().id(id).build();
+//    }
 
     @Override
-    public UserDto.LoginResDto login(UserDto.LoginReqDto param) {
-        Long id = null;
+    public UserDto.TokenResDto login(UserDto.LoginReqDto param) {
         User user = userRepository.findByUsernameAndPassword(param.getUsername(), param.getPassword());
-        if(user != null){
-            id = user.getId();
+        if(user == null){
+            throw new RuntimeException("no data");
         }
-        return UserDto.LoginResDto.builder().id(id).build();
+        Long id = user.getId();
+
+//        TokenFactory tokenFactory = new TokenFactory();
+//        String token = tokenFactory.createRefreshToken(id);
+//        Long userId = tokenFactory.validateToken(token);
+//        System.out.println("dlrj?userId = " + userId);
+
+        String token = tokenFactory.createRefreshToken(id);
+        // DB에 저장
+        RefreshToken refreshToken = RefreshToken.of(id, token);
+        refreshTokenRepository.save(refreshToken);
+
+        return UserDto.TokenResDto.builder().token(token).build();
     }
 
     /**/

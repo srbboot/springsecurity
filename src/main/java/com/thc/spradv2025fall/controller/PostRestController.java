@@ -3,6 +3,7 @@ package com.thc.spradv2025fall.controller;
 import com.thc.spradv2025fall.dto.DefaultDto;
 import com.thc.spradv2025fall.dto.PostDto;
 import com.thc.spradv2025fall.service.PostService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,14 @@ public class PostRestController {
     /**/
 
     @PostMapping("")
-    public ResponseEntity<DefaultDto.CreateResDto> create(@RequestBody PostDto.CreateReqDto param){
+    public ResponseEntity<DefaultDto.CreateResDto> create(@RequestBody PostDto.CreateReqDto param, HttpServletRequest request){
+        Object reqUserId = request.getAttribute("reqUserId");
+        if (reqUserId != null) {
+            param.setUserId(Long.parseLong(reqUserId.toString()));
+        } else {
+            throw new RuntimeException("no auth");
+        }
+
         return ResponseEntity.ok(postService.create(param));
     }
     @PutMapping("")
@@ -47,7 +55,7 @@ public class PostRestController {
         return ResponseEntity.ok(postService.pagedList(param));
     }
     @GetMapping("/scrollList")
-    public ResponseEntity<List<PostDto.DetailResDto>> scrollList(PostDto.ScrollListReqDto param){
+    public ResponseEntity<List<PostDto.DetailResDto>> scrollList(PostDto.ScrollListReqDto param, HttpServletRequest request){
         return ResponseEntity.ok(postService.scrollList(param));
     }
 
