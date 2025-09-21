@@ -1,5 +1,8 @@
 package com.thc.spradv2025fall.controller;
 
+import com.thc.spradv2025fall.exception.InvalidTokenException;
+import com.thc.spradv2025fall.security.AuthService;
+import com.thc.spradv2025fall.security.ExternalProperties;
 import com.thc.spradv2025fall.util.TokenFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +14,23 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class AuthRestController {
 
+    final AuthService authService;
+    final ExternalProperties externalProperties;
+
+    @PostMapping("")
+    public ResponseEntity<Void> access(HttpServletRequest request) {
+        String refreshToken = request.getHeader(externalProperties.getRefreshKey());
+        String prefix = externalProperties.getTokenPrefix();
+        if(refreshToken == null || refreshToken.isEmpty() || !refreshToken.startsWith(prefix)) {
+            throw new InvalidTokenException("Refresh Token Not Found");
+        }
+        refreshToken = refreshToken.substring(prefix.length());
+        String accessToken = authService.issueAccessToken(refreshToken);
+        return ResponseEntity.ok().header(externalProperties.getAccessKey(), prefix + accessToken).build();
+    }
+
+
+    /*
     String token_prefix = "Bearer ";
 
     final TokenFactory tokenFactory;
@@ -27,7 +47,6 @@ public class AuthRestController {
             throw new RuntimeException("Invalid token");
         }
 
-        System.out.println("@@@@@@@@2Refresh token: " + refreshToken);
         Long userId = tokenFactory.validateRefreshToken(refreshToken);
 
         if(userId == null){
@@ -36,5 +55,5 @@ public class AuthRestController {
 
         String token = tokenFactory.createAccessToken(userId);
         return ResponseEntity.ok().header("Authorization", token_prefix + token).build();
-    }
+    }*/
 }

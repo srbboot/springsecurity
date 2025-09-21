@@ -17,17 +17,20 @@ public class UserRestController {
 
     final UserService userService;
 
+    /*
     String token_prefix = "Bearer ";
 
-//    @PostMapping("/login")
-//    public ResponseEntity<UserDto.LoginResDto> login(@RequestBody UserDto.LoginReqDto param){
-//        return ResponseEntity.ok(userService.login(param));
-//    }
+    @PostMapping("/login")
+    public ResponseEntity<UserDto.LoginResDto> login(@RequestBody UserDto.LoginReqDto param){
+        return ResponseEntity.ok(userService.login(param));
+    }*/
+    /*
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody UserDto.LoginReqDto param){
         String data = userService.login(param).getToken();
         return ResponseEntity.ok().header("RefreshToken", token_prefix + data).build();
     }
+     */
 
     /**/
 

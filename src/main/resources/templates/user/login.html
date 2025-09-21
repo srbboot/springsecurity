@@ -21,7 +21,8 @@ password : <input type="password" class="input_param" name="password" id="input_
             tempParam[$(each).attr("name")] = $(each).val();
         }
         $.ajax({
-            url: '/api/user/login',
+            // url: '/api/user/login',
+            url: '/api/login',
             method: 'POST',
             contentType : 'application/json; charset=utf-8',
             data : JSON.stringify(tempParam),

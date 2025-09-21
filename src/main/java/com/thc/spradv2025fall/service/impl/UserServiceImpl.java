@@ -1,15 +1,20 @@
 package com.thc.spradv2025fall.service.impl;
 
 import com.thc.spradv2025fall.domain.RefreshToken;
+import com.thc.spradv2025fall.domain.RoleType;
 import com.thc.spradv2025fall.domain.User;
+import com.thc.spradv2025fall.domain.UserRoleType;
 import com.thc.spradv2025fall.dto.UserDto;
 import com.thc.spradv2025fall.dto.DefaultDto;
 import com.thc.spradv2025fall.mapper.UserMapper;
 import com.thc.spradv2025fall.repository.RefreshTokenRepository;
+import com.thc.spradv2025fall.repository.RoleTypeRepository;
 import com.thc.spradv2025fall.repository.UserRepository;
+import com.thc.spradv2025fall.repository.UserRoleTypeRepository;
 import com.thc.spradv2025fall.service.UserService;
 import com.thc.spradv2025fall.util.TokenFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,6 +28,9 @@ public class UserServiceImpl implements UserService {
     final UserMapper userMapper;
     final RefreshTokenRepository refreshTokenRepository;
     final TokenFactory tokenFactory;
+    final BCryptPasswordEncoder bCryptPasswordEncoder;
+    final RoleTypeRepository roleTypeRepository;
+    final UserRoleTypeRepository userRoleTypeRepository;
 
 //    @Override
 //    public UserDto.LoginResDto login(UserDto.LoginReqDto param) {
@@ -34,7 +42,7 @@ public class UserServiceImpl implements UserService {
 //        return UserDto.LoginResDto.builder().id(id).build();
 //    }
 
-    @Override
+    /*@Override
     public UserDto.TokenResDto login(UserDto.LoginReqDto param) {
         User user = userRepository.findByUsernameAndPassword(param.getUsername(), param.getPassword());
         if(user == null){
@@ -53,7 +61,7 @@ public class UserServiceImpl implements UserService {
         refreshTokenRepository.save(refreshToken);
 
         return UserDto.TokenResDto.builder().token(token).build();
-    }
+    }*/
 
     /**/
 
@@ -65,14 +73,28 @@ public class UserServiceImpl implements UserService {
         if(user != null){
             throw new RuntimeException("already exist");
         }
-        return userRepository.save(param.toEntity()).toCreateResDto();
+//        return userRepository.save(param.toEntity()).toCreateResDto();
+        //시큐리티용 패쓰워드 사용!
+        param.setPassword(bCryptPasswordEncoder.encode(param.getPassword()));
+
+        User newUser = userRepository.save(param.toEntity());
+        DefaultDto.CreateResDto res = newUser.toCreateResDto();
+
+        RoleType roleType = roleTypeRepository.findByTypeName("ROLE_USER");
+        if (roleType == null) {
+            roleType = roleTypeRepository.save(RoleType.of("user", "ROLE_USER"));
+        }
+
+        userRoleTypeRepository.save(UserRoleType.of(newUser, roleType));
+
+        return res;
     }
 
     @Override
     public void update(UserDto.UpdateReqDto param) {
         User user = userRepository.findById(param.getId()).orElseThrow(() -> new RuntimeException("no data"));
         if(param.getDeleted() != null){ user.setDeleted(param.getDeleted()); }
-        if(param.getPassword() != null){ user.setPassword(param.getPassword()); }
+        if(param.getPassword() != null){ user.setPassword(bCryptPasswordEncoder.encode(param.getPassword())); }
         if(param.getName() != null){ user.setName(param.getName()); }
         if(param.getPhone() != null){ user.setPhone(param.getPhone()); }
         userRepository.save(user);

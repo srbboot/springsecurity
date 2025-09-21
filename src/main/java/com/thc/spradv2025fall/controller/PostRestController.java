@@ -2,11 +2,14 @@ package com.thc.spradv2025fall.controller;
 
 import com.thc.spradv2025fall.dto.DefaultDto;
 import com.thc.spradv2025fall.dto.PostDto;
+import com.thc.spradv2025fall.security.PrincipalDetails;
 import com.thc.spradv2025fall.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -54,8 +57,10 @@ public class PostRestController {
     public ResponseEntity<DefaultDto.PagedListResDto> pagedList(PostDto.PagedListReqDto param){
         return ResponseEntity.ok(postService.pagedList(param));
     }
+    @PreAuthorize("hasRole('USER')")
+//    @PreAuthorize("permitAll()")
     @GetMapping("/scrollList")
-    public ResponseEntity<List<PostDto.DetailResDto>> scrollList(PostDto.ScrollListReqDto param, HttpServletRequest request){
+    public ResponseEntity<List<PostDto.DetailResDto>> scrollList(PostDto.ScrollListReqDto param, @AuthenticationPrincipal PrincipalDetails principalDetails){
         return ResponseEntity.ok(postService.scrollList(param));
     }
 
